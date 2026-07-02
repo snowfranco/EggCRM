@@ -20,6 +20,9 @@ data/escalations/
 data/rag_store/
 eval/logs/
 *.log
+# adk web / adk run session + artifact storage (created under the agents dir at runtime)
+.adk/
+*.db
 
 # Web UI build (deps at repo root → single React copy; see package.json)
 node_modules/

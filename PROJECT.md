@@ -1,4 +1,4 @@
-# NovaCRM Support Agent — Project 3
+# EggCRM Support Agent — Project 3
 
 Customer support agent with **memory** and **guardrails**, built **without an agent
 framework** (raw Python orchestration loop). Third project in Google's 5-Day AI Agents
@@ -10,7 +10,7 @@ Intensive course track. Project 1 (research agent, ADK) lives at `../research-ag
 3. Compare the "with framework" (P1/ADK) vs "without framework" (P3) experience.
 
 ## Scope (locked)
-- **Domain:** NovaCRM — fictional CRM SaaS. Billing / account / feature / bug support.
+- **Domain:** EggCRM — fictional CRM SaaS. Billing / account / feature / bug support.
 - **Memory:** session (short-term) + cross-session per-user facts (long-term). No
   semantic/embedding memory this project. RAG vs. memory demonstrated side-by-side.
 - **Guardrails:** all four categories (prompt injection, PII, topic boundary,

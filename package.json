@@ -2,7 +2,7 @@
   "name": "novacrm-demo-build",
   "private": true,
   "version": "0.1.0",
-  "description": "Builds the NovaCRM demo UI (localdoc/novacrm-demo.jsx) into webui/app.js. Deps live at the repo root so the component (localdoc/) and entry (webui/) resolve a SINGLE React copy.",
+  "description": "Builds the EggCRM demo UI (localdoc/novacrm-demo.jsx) into webui/app.js. Deps live at the repo root so the component (localdoc/) and entry (webui/) resolve a SINGLE React copy.",
   "scripts": {
     "build": "esbuild webui/main.jsx --bundle --outfile=webui/app.js --loader:.jsx=jsx --jsx=automatic --minify --define:process.env.NODE_ENV='\"production\"'"
   },

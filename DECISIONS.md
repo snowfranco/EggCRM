@@ -1,4 +1,4 @@
-# Decision Log: NovaCRM Support Agent (Project 3)
+# Decision Log: EggCRM Support Agent (Project 3)
 
 A record of architectural decisions made during build, with the problem each one
 solved and the trade-offs accepted. Chronological — written as decisions were
@@ -69,7 +69,7 @@ separately (P1 learning).
 
 ---
 
-## D3: Product domain & knowledge base — NovaCRM
+## D3: Product domain & knowledge base — EggCRM
 
 **Status:** Human-authored content received 2026-06-26 → `data/knowledge_base/novacrm_kb.json`.
 In review. Tiers: Starter $29 / Professional $79 / Enterprise $149 (20% annual discount).

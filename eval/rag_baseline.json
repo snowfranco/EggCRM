@@ -1,0 +1,271 @@
+{
+  "summary": {
+    "model": "meta-llama/llama-4-scout-17b-16e-instruct (groq, STOPGAP)",
+    "recall_rate": 1.0,
+    "correct_rate": 1.0,
+    "r10_declines": true,
+    "gate": true
+  },
+  "cases": [
+    {
+      "id": "R1",
+      "category": "feature-howto",
+      "question": "How do I set up a workflow automation?",
+      "answer": "To set up a workflow automation, go to **Settings > Workflows > New Automation**. An automation has three parts: a **trigger** (what starts it), optional **conditions** (filters that must be true), and one or more **actions** (what it does). Give the automation a name, build the rule, then toggle it **Active**. New automations are created inactive so you can review them before they run.\n\nWorkflow automation requires the **Professional** plan or higher. It is not available on Starter.\n\nAvailable triggers include: a contact is created or updated, a contact enters or leaves a segment, a deal is created, a deal changes stage, a deal is marked Won or Lost, a date field is reached (for example, renewal date in 30 days), or a form is submitted. Each automation has exactly one trigger.\n\nAvailable actions include: send a templated email, create a task and assign it to a user, update a field on the record, add or remove a tag, move a deal to a stage, send a Slack message (requires the Slack integration, Professional+), and call a webhook (custom webhooks are Enterprise-only). An automation can run several actions in order.",
+      "retrieved_sources": [
+        "04-pipeline-management.md",
+        "05-workflow-automation.md"
+      ],
+      "top_score": 0.585,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "workflows",
+          "new automation"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3255,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R2",
+      "category": "feature-factual",
+      "question": "How much is the Professional plan \u2014 monthly and annual?",
+      "answer": "The Professional plan costs $79/user/month, or $63.20/user/month billed annually.",
+      "retrieved_sources": [
+        "02-plans-and-pricing.md",
+        "16-billing-and-plan-changes.md"
+      ],
+      "top_score": 0.665,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "79",
+          "63.20"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3212,
+      "tool_calls": [
+        "retrieve_docs"
+      ]
+    },
+    {
+      "id": "R3",
+      "category": "tier-boundary",
+      "question": "Can I use Zapier on the Professional plan?",
+      "answer": "No, Zapier is only available on the Enterprise plan. According to the \"Integrations Overview\" and \"Plans & Pricing\" documentation, Zapier integration is listed as an Enterprise-only feature. The Professional plan includes features like pipeline management, workflow automation, API access, Slack and Gmail integrations, but not Zapier.",
+      "retrieved_sources": [
+        "01-getting-started.md",
+        "02-plans-and-pricing.md",
+        "07-integrations-overview.md"
+      ],
+      "top_score": 0.558,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "enterprise"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3359,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R4",
+      "category": "tier-boundary",
+      "question": "Is API access available on the Starter plan?",
+      "answer": "No, API access is not available on the Starter plan. It requires Professional or higher.",
+      "retrieved_sources": [
+        "01-getting-started.md",
+        "02-plans-and-pricing.md",
+        "07-integrations-overview.md"
+      ],
+      "top_score": 0.521,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "professional"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3325,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R5",
+      "category": "api",
+      "question": "How do I authenticate a request to the EggCRM API?",
+      "answer": "To authenticate a request to the EggCRM API, you need to pass the key as a bearer token in the `Authorization` header. The header should be in the format:\n\n```\nAuthorization: Bearer nova_sk_live_xxxxxxxx\n```\n\nReplace `nova_sk_live_xxxxxxxx` with your actual API key. A missing or invalid key will return a `401 Unauthorized` error, while a valid key without permission for the resource will return a `403 Forbidden` error. \n\nYou can find more information on authentication in the \"API Overview & Authentication\" documentation.",
+      "retrieved_sources": [
+        "10-api-overview-and-auth.md",
+        "13-webhooks-api.md",
+        "14-rate-limits-and-errors.md"
+      ],
+      "top_score": 0.761,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "bearer",
+          "authorization"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3114,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R6",
+      "category": "api",
+      "question": "What's the API rate limit on Enterprise, and what happens if I exceed it?",
+      "answer": "The API rate limit on Enterprise is 10,000 API requests per hour, per account. If you exceed this limit, you'll receive a `429 Too Many Requests` response with a `Retry-After` header indicating how many seconds to wait before retrying. Be sure to honor this interval to avoid further rate limiting. For more information, see the \"API Rate Limits & Errors\" documentation.",
+      "retrieved_sources": [
+        "14-rate-limits-and-errors.md"
+      ],
+      "top_score": 0.795,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "10,000",
+          "429"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3202,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R7",
+      "category": "troubleshooting",
+      "question": "My dashboard is really slow around 10am \u2014 is something wrong?",
+      "answer": "Your dashboard slowness around 10 am is likely due to a known issue with EggCRM dashboards and large reports loading slowly during peak hours, approximately 9-11 AM ET. This is a recognized performance degradation, and a fix is scheduled for an upcoming release. \n\nTo work around this issue, you can try narrowing the date range on the report or dashboard, reducing widgets per dashboard, running heavy reports outside the 9-11 AM ET window, or exporting to CSV for large pulls instead of rendering them on screen.\n\nIf the slowness persists or is severe, you can file a bug and collect details such as browser and version, the specific dashboard/report, the time and timezone it occurred, the approximate record volume, and any error messages. \n\nYou can also check the EggCRM status page for any active incidents that could explain broader slowness or errors. \n\nReference: \"Dashboard Performance Troubleshooting\" in the EggCRM documentation.",
+      "retrieved_sources": [
+        "17-dashboard-performance.md"
+      ],
+      "top_score": 0.677,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "9",
+          "11",
+          "et"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3292,
+      "tool_calls": [
+        "search_by_metadata"
+      ]
+    },
+    {
+      "id": "R8",
+      "category": "troubleshooting-policy",
+      "question": "I want a refund for this month.",
+      "answer": "Refunds are available within 14 days of the initial purchase only and are pro-rated. However, as this month's refund request is likely beyond the 14-day window, I don't have documentation covering it. I can offer to escalate or follow up on your request. Would you like me to do so?",
+      "retrieved_sources": [
+        "02-plans-and-pricing.md",
+        "16-billing-and-plan-changes.md",
+        "20-service-levels-and-support.md"
+      ],
+      "top_score": 0.597,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "14 days",
+          "pro-rated"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3218,
+      "tool_calls": [
+        "retrieve_docs"
+      ]
+    },
+    {
+      "id": "R9",
+      "category": "feature-howto",
+      "question": "How do I export all my data, and how long does it take?",
+      "answer": "To export all your data, go to **Settings > Data Management > Export** and start an export request. The processing takes up to **24 hours**. When ready, the export is delivered as a **ZIP file via email** to the requesting admin. The ZIP contains **CSV files** \u2014 one per record type (contacts, deals, activities, notes, custom fields).\n\nIf you need to export a single report's data, use the **Export** button on that report (CSV) \u2014 this is immediate and does not require the 24-hour full-export process. \n\nFor more information, you can refer to the **Data Export & Management** and **Data Export Troubleshooting** documents.",
+      "retrieved_sources": [
+        "06-reporting-and-analytics.md",
+        "08-data-export-and-management.md",
+        "19-data-export-troubleshooting.md"
+      ],
+      "top_score": 0.648,
+      "recall": true,
+      "correct": true,
+      "facts": {
+        "found": [
+          "data management",
+          "24 hours"
+        ],
+        "missing": [],
+        "negate_ok": true
+      },
+      "iterations": 2,
+      "tokens": 3244,
+      "tool_calls": [
+        "retrieve_docs"
+      ]
+    },
+    {
+      "id": "R10",
+      "category": "not-in-docs",
+      "question": "Does EggCRM have a dark mode?",
+      "answer": "EggCRM does not mention having a dark mode in the provided documentation. If you need more information on customizing your view or accessibility features, I can try to help you escalate or follow up on this topic.",
+      "retrieved_sources": [
+        "01-getting-started.md",
+        "10-api-overview-and-auth.md",
+        "14-rate-limits-and-errors.md",
+        "17-dashboard-performance.md",
+        "20-service-levels-and-support.md"
+      ],
+      "top_score": 0.469,
+      "recall": null,
+      "correct": true,
+      "facts": {
+        "declined": true
+      },
+      "iterations": 2,
+      "tokens": 2973,
+      "tool_calls": [
+        "retrieve_docs"
+      ]
+    }
+  ]
+}

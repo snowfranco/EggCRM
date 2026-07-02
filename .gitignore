@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Secrets
+.env
+
+# Runtime artifacts (git does NOT support inline comments — keep patterns comment-free)
+# per-user long-term memory (Phase 3) — runtime state, not source
+data/memory_store/
+# session state (Phase 2)
+data/sessions/
+# HITL escalation case files (Phase 5)
+data/escalations/
+# ChromaDB persistent vector store (Project 4) — rebuilt by `python -m novacrm_agent.rag.ingest`
+data/rag_store/
+eval/logs/
+*.log
+
+# Web UI build (deps at repo root → single React copy; see package.json)
+node_modules/
+# (webui/app.js is the built bundle — kept so the server runs without a build step)
+
+# OS
+.DS_Store

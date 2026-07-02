@@ -1,0 +1,136 @@
+{
+  "model": "z-ai/glm-4.7-flash",
+  "total": 10,
+  "passed": 10,
+  "pass_rate": 1.0,
+  "avg_iterations": 1.8,
+  "total_tokens": 29847,
+  "results": [
+    {
+      "id": "Q1",
+      "category": "factual-kb",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "lookup_knowledge_base"
+      ],
+      "iterations": 2,
+      "tokens": 3222,
+      "hit_max_iters": false,
+      "final_text": "The Professional plan costs **$79 per user per month**. If you pay annually, it's **$63.20 per user per month** (billed as $79/user/month).\n\nIt includes everything in the Starter plan plus:\n- Pipeline management\n- Workflow automation\n- API access\n- 50GB storage\n- Priority email + chat support\n\nIs there anything else I can help with?"
+    },
+    {
+      "id": "Q2",
+      "category": "account-lookup",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "get_account_info"
+      ],
+      "iterations": 2,
+      "tokens": 3232,
+      "hit_max_iters": false,
+      "final_text": "Your account is on the **Professional** plan with an **annual billing cycle**. You currently have **12 seats** assigned, and your account is active.\n\nIs there anything else I can help with?"
+    },
+    {
+      "id": "Q3",
+      "category": "how-to-kb",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "lookup_knowledge_base"
+      ],
+      "iterations": 2,
+      "tokens": 3393,
+      "hit_max_iters": false,
+      "final_text": "To generate an API key in EggCRM:\n\n1. Go to **Settings** (gear icon in the top right)\n2. Navigate to **Integrations**\n3. Select **API Keys**\n4. Click **Generate New Key**\n\nYour new key will appear immediately. Copy and save it securely \u2014 you won't be able to see it again after you leave this page.\n\n**Note:** API access is included on the Professional plan and above. If you're on a lower tier, you may need to upgrade to use this feature.\n\nIs there anything else I can help with?"
+    },
+    {
+      "id": "Q4",
+      "category": "multi-step",
+      "passed": true,
+      "note": "ok (proposed + confirmed before creating, per prompt)",
+      "tools_used": [
+        "get_account_info"
+      ],
+      "iterations": 2,
+      "tokens": 3523,
+      "hit_max_iters": false,
+      "final_text": "I can see you're already have an open ticket (TICK-5567). Let me log a new ticket for your dashboard loading issue.\n\nBefore I create it, can you confirm this summary:\n- **Summary**: Dashboard won't load at all, preventing work\n- **Priority**: High (workflow is blocked)\n\nIs that correct?"
+    },
+    {
+      "id": "Q5",
+      "category": "escalation-refund",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "escalate_to_team"
+      ],
+      "iterations": 2,
+      "tokens": 3255,
+      "hit_max_iters": false,
+      "final_text": "I'm going to connect you with our billing team who can help with this directly. They'll have the full context of our conversation.\n\nThe billing team will review your request and get back to you with next steps. Is there anything else I can help with?"
+    },
+    {
+      "id": "Q6",
+      "category": "escalation-cancel",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "escalate_to_team"
+      ],
+      "iterations": 2,
+      "tokens": 3314,
+      "hit_max_iters": false,
+      "final_text": "I'm going to connect you with our retention team who can help with account cancellation directly. They'll have the full context of our conversation and can walk you through the process."
+    },
+    {
+      "id": "Q7",
+      "category": "escalation-gdpr",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "escalate_to_team"
+      ],
+      "iterations": 2,
+      "tokens": 3330,
+      "hit_max_iters": false,
+      "final_text": "I'm going to connect you with our compliance team who can help with this directly. They'll have the full context of our conversation."
+    },
+    {
+      "id": "Q8",
+      "category": "escalation-abuse",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [
+        "escalate_to_team"
+      ],
+      "iterations": 2,
+      "tokens": 3229,
+      "hit_max_iters": false,
+      "final_text": "I'm going to connect you with our supervisor team who can help with this directly. They'll have the full context of our conversation."
+    },
+    {
+      "id": "Q9",
+      "category": "out-of-scope",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [],
+      "iterations": 1,
+      "tokens": 1610,
+      "hit_max_iters": false,
+      "final_text": "I'm a customer support agent for EggCRM, so I can only help with questions about our CRM platform \u2014 including billing, features, account details, and technical support.\n\nFor weather information, I'd recommend checking a weather app or website like Weather.com, AccuWeather, or your local news station.\n\nIs there anything I can help you with regarding EggCRM?"
+    },
+    {
+      "id": "Q10",
+      "category": "ambiguous",
+      "passed": true,
+      "note": "ok",
+      "tools_used": [],
+      "iterations": 1,
+      "tokens": 1739,
+      "hit_max_iters": false,
+      "final_text": "I'd be happy to help, but I need a bit more information to assist you. Could you please tell me:\n\n1. What specifically is broken? (e.g., login, a feature, a report, syncing, etc.)\n2. When did this start happening?\n3. Are you seeing any error messages?\n\nOnce I understand the issue, I can look into it right away."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "model": "z-ai/glm-4.7-flash",
+  "regression": {
+    "total": 15,
+    "passed": 14
+  },
+  "cross_session": {
+    "total": 3,
+    "passed": 3,
+    "results": [
+      {
+        "id": "X1",
+        "title": "issue recall across sessions",
+        "passed": true,
+        "checks": [
+          {
+            "label": "S1 stored an issue_history memory about the dashboard crash",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "S2 recalls the specific dashboard/crash issue",
+            "passed": true,
+            "hard": true,
+            "note": "reply=\"i don't see any open tickets on your account. however, i recall you've been experiencing d\""
+          },
+          {
+            "label": "S2 tone reflects prior frustration",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "X2",
+        "title": "comms preference honored across sessions",
+        "passed": true,
+        "checks": [
+          {
+            "label": "S1 stored a communication_preferences memory (email)",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "S2 offers to follow up by email (honors stored preference)",
+            "passed": true,
+            "hard": true,
+            "note": "reply=\"i'm sorry to hear your email integration keeps disconnecting \u2014 that's definitely frustrati\""
+          },
+          {
+            "label": "S2 does not re-ask preferred contact method",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "X3",
+        "title": "continuity + store-level exclusion (D5)",
+        "passed": true,
+        "checks": [
+          {
+            "label": "S1 stored a sentiment_trajectory memory (billing frustration)",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "STORE excludes the dollar amount ($480) \u2014 checked in the JSON, not the reply",
+            "passed": true,
+            "hard": true,
+            "note": "facts=['tom is the contact at delta.', 'reports a second billing problem in a row.', 'frustrated and fed up with recurring billing issues.']"
+          },
+          {
+            "label": "STORE excludes the payment_overdue/overdue status \u2014 checked in the JSON",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "S2 helps with the workflow request on-topic",
+            "passed": true,
+            "hard": true,
+            "note": "reply=\"here's how to set up a new workflow automation in novacrm:\\n\\n**steps to create a new workfl\""
+          },
+          {
+            "label": "S2 shows continuity / extra care given prior frustration",
+            "passed": false,
+            "hard": false,
+            "note": ""
+          }
+        ]
+      }
+    ]
+  }
+}

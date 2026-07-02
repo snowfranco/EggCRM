@@ -1,0 +1,185 @@
+{
+  "summary": {
+    "model": "GLM-4.7-Flash (openrouter)",
+    "positive_grounded_rate": 1.0,
+    "negative_catch_rate": 1.0,
+    "gate": true
+  },
+  "positive": [
+    {
+      "id": "R1",
+      "q": "How do I set up a workflow automation?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "To set up a workflow automation, follow these steps:\n\n**1. Navigate to the automation builder**\n- Go to **Settings > Workflows > New Automation**\n\n**2. Define the automation components**\n- **Trigger**"
+    },
+    {
+      "id": "R2",
+      "q": "How much is the Professional plan \u2014 monthly and annual?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "The Professional plan pricing is:\n\n- **Monthly:** $79/user/month\n- **Annual:** $63.20/user/month (20% discount off the monthly price)\n\nIf you're interested in switching to the Professional plan, I can"
+    },
+    {
+      "id": "R3",
+      "q": "Can I use Zapier on the Professional plan?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "No, Zapier integration is not available on the Professional plan. According to our feature availability, Zapier is Enterprise-only.\n\n**Professional plan includes:**\n- Slack integration\n- Gmail integra"
+    },
+    {
+      "id": "R4",
+      "q": "Is API access available on the Starter plan?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "No, API access is not available on the Starter plan. It requires the Professional plan or higher.\n\n**API access is available on:**\n- Professional plan\n- Enterprise plan\n\nIf you're looking for API acce"
+    },
+    {
+      "id": "R5",
+      "q": "How do I authenticate a request to the EggCRM API?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "To authenticate a request to the EggCRM API, use a bearer token in the `Authorization` header:\n\n**Step 1: Generate an API Key**\n- Go to **Settings > Integrations > API Keys > Generate New Key**\n- Cop"
+    },
+    {
+      "id": "R6",
+      "q": "What's the API rate limit on Enterprise, and what happens if I exceed it?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "**Enterprise API rate limit:** 10,000 API requests per hour, per account. Limits are enforced on a rolling one-hour window.\n\n**If you exceed the limit:**\n- Over-limit requests return a `429 Too Many R"
+    },
+    {
+      "id": "R7",
+      "q": "My dashboard is really slow around 10am \u2014 is something wrong?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "Your dashboard slowness around 10am is likely due to a **known issue** with EggCRM. \n\n**What's happening:** There's a recognized performance degradation where dashboards and large reports load slowly"
+    },
+    {
+      "id": "R8",
+      "q": "I want a refund for this month.",
+      "route": [],
+      "grounding": {},
+      "grounded": true,
+      "answer": "I see you're requesting a refund for this month. Refund requests need to be reviewed by our billing team, who can approve or deny them. Before I connect you with them, I'll need a couple of details:\n\n"
+    },
+    {
+      "id": "R9",
+      "q": "How do I export all my data, and how long does it take?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "To export all your data:\n\n**Step 1:** Go to **Settings > Data Management > Export** and start an export request.\n\n**Time to complete:**\n- Processing takes **up to 24 hours**\n- Once ready, the export i"
+    },
+    {
+      "id": "R10",
+      "q": "Does EggCRM have a dark mode?",
+      "route": [
+        "nova_docs"
+      ],
+      "grounding": {
+        "checked": true,
+        "grounded": true,
+        "score": 5,
+        "reason": "The answer honestly declines to provide information beyond the passages, suggesting escalation or further research.",
+        "flagged": false
+      },
+      "grounded": true,
+      "answer": "Based on the available documentation, I don't have information about EggCRM's dark mode feature. The current documentation covers troubleshooting, support, security, and API topics, but not UI appear"
+    }
+  ],
+  "negative_control": [
+    {
+      "id": "N1",
+      "q": "How much is the Professional plan?",
+      "flagged": true,
+      "score": 1,
+      "reason": "The price of the Professional plan and the existence of a free tier with 3 users are not mentioned in the passages."
+    },
+    {
+      "id": "N2",
+      "q": "Can I use Zapier on the Professional plan?",
+      "flagged": true,
+      "score": 1,
+      "reason": "The claim that Zapier is fully supported on the Professional plan at no extra cost is unsupported; the passages state Zapier is Enterprise-only."
+    },
+    {
+      "id": "N3",
+      "q": "What is the Enterprise API rate limit?",
+      "flagged": true,
+      "score": 1,
+      "reason": "The claim that 'Enterprise has no rate limit \u2014 you can make unlimited API requests per second' is not supported by the passages, which state that Enterprise has 10,000 API requests per hour, per accou"
+    }
+  ]
+}

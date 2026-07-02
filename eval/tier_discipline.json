@@ -1,0 +1,292 @@
+{
+  "summary": {
+    "model": "GLM-4.7-Flash (openrouter)",
+    "reps": 5,
+    "discipline_rate": 1.0,
+    "answer_rate": 1.0,
+    "flickering": [],
+    "gate": true
+  },
+  "cases": [
+    {
+      "id": "T1",
+      "question": "What integrations does my plan support?",
+      "customer": "CUST-1001",
+      "tier": "Professional",
+      "reps": [
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        }
+      ],
+      "discipline_pass": 5,
+      "answer_pass": 5,
+      "n": 5
+    },
+    {
+      "id": "T2",
+      "question": "Can I use the API on my current plan?",
+      "customer": "CUST-1002",
+      "tier": "Starter",
+      "reps": [
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        }
+      ],
+      "discipline_pass": 5,
+      "answer_pass": 5,
+      "n": 5
+    },
+    {
+      "id": "T3",
+      "question": "Can I use Zapier on my plan?",
+      "customer": "CUST-1001",
+      "tier": "Professional",
+      "reps": [
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        }
+      ],
+      "discipline_pass": 5,
+      "answer_pass": 5,
+      "n": 5
+    },
+    {
+      "id": "T4",
+      "question": "Does my plan include custom webhooks?",
+      "customer": "CUST-1004",
+      "tier": "Professional",
+      "reps": [
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        }
+      ],
+      "discipline_pass": 5,
+      "answer_pass": 5,
+      "n": 5
+    },
+    {
+      "id": "T5",
+      "question": "What's my hourly API rate limit on my plan?",
+      "customer": "CUST-1003",
+      "tier": "Enterprise",
+      "reps": [
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        },
+        {
+          "route": [
+            "get_account_info",
+            "nova_docs"
+          ],
+          "discipline_ok": true,
+          "reason": "ok",
+          "answer_ok": true
+        }
+      ],
+      "discipline_pass": 5,
+      "answer_pass": 5,
+      "n": 5
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "summary": {
+    "model": "GLM-4.7-Flash (openrouter)",
+    "route_rate": 1.0,
+    "answer_rate": 1.0,
+    "correct_rate": 1.0,
+    "gate": true
+  },
+  "cases": [
+    {
+      "id": "RC1",
+      "category": "anchor-doc",
+      "question": "How do I set up a workflow automation?",
+      "customer": null,
+      "route": [
+        "nova_docs"
+      ],
+      "expect_routes": [
+        "nova_docs"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "workflows"
+        ],
+        "facts_missing": []
+      },
+      "rag_sources": [
+        "04-pipeline-management.md",
+        "05-workflow-automation.md"
+      ],
+      "answer": "To set up a workflow automation, follow these steps:\n\n1. **Navigate** to **Settings > Workflows > New Automation**\n2. **Define your automation** with three parts:\n   - **Trigger** \u2014 what starts the automation (e.g., a deal stage change, record creation)\n   - **Conditions** \u2014 optional filters that must be true for the automation to run\n   - **Actions** \u2014 one or more actions the automation performs (e.g., send an email, create a task, update a field, add/remove a tag, move a deal, send a Slack message, or call a webhook)\n3. **Name** the automation and build the rule\n4. **Toggle it Active** (new automations are created inactive so you can review them first)\n\n**Prerequisites:**\n- Workflow automation is available on the **Professional** plan or higher (not available on Starter)\n\n**Note:** An automation can run multiple actions in sequence. Email-sending actions are subject to your plan's email-sending limits. For very high-volume sends, consider using a segment plus a scheduled campaign instead of a per-record automation.\n\nIs there anything specific about workflow automations you'd like more details on?"
+    },
+    {
+      "id": "RC2",
+      "category": "anchor-account",
+      "question": "What plan is my account on?",
+      "customer": "CUST-1003",
+      "route": [
+        "get_account_info"
+      ],
+      "expect_routes": [
+        "get_account_info"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "enterprise"
+        ],
+        "facts_missing": []
+      },
+      "rag_sources": [],
+      "answer": "Your account is on the **Enterprise** plan.\n\nHere are your account details:\n\n| Field | Value |\n|-------|-------|\n| **Plan** | Enterprise |\n| **Billing Cycle** | Annual |\n| **Seats** | 85 |\n| **Storage Used** | 312.7 GB |\n| **Account Status** | Active |\n| **Sign-up Date** | November 2, 2024 |\n\nNote: You have **1 open ticket** (TICK-5567) on your account. Let me know if you'd like me to help with anything related to that or any other question!"
+    },
+    {
+      "id": "RC3",
+      "category": "boundary-account+rag",
+      "question": "What integrations does my plan support?",
+      "customer": "CUST-1001",
+      "route": [
+        "get_account_info",
+        "nova_docs"
+      ],
+      "expect_routes": [
+        "get_account_info",
+        "nova_docs"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "slack",
+          "gmail"
+        ],
+        "facts_missing": []
+      },
+      "rag_sources": [
+        "02-plans-and-pricing.md",
+        "05-workflow-automation.md",
+        "07-integrations-overview.md",
+        "10-api-overview-and-auth.md"
+      ],
+      "answer": "Your **Professional** plan supports the following integrations:\n\n**Available on your plan:**\n- **Email integration** \u2014 connects a mailbox so messages log to contact timelines (available on every plan)\n- **Slack integration**\n- **Gmail integration**\n- **API access**\n\n**Note:** Zapier integration and custom webhooks are Enterprise-only features. If you're interested in those additional capabilities, you may want to consider upgrading to the Enterprise plan.\n\nWould you like help setting up any of these integrations?"
+    },
+    {
+      "id": "RC4",
+      "category": "known-issue-not-ticket",
+      "question": "My dashboard is really slow around 10am \u2014 is something wrong?",
+      "customer": "CUST-1001",
+      "route": [
+        "nova_docs"
+      ],
+      "expect_routes": [
+        "nova_docs"
+      ],
+      "forbid_routes": [
+        "create_support_ticket"
+      ],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "9",
+          "11"
+        ],
+        "facts_missing": []
+      },
+      "rag_sources": [
+        "17-dashboard-performance.md"
+      ],
+      "answer": "This is actually a **known issue** at EggCRM. Here's what the documentation says:\n\n## Known Issue\nDashboards and large reports can load slowly during **peak hours (9\u201311 AM ET)** due to high aggregate query load. A fix is scheduled for an upcoming release.\n\n## Your Situation\nBased on what you described (slow dashboard around 10 AM), this aligns with the known issue window.\n\n## Workarounds (while the fix ships)\n- **Narrow the date range** on reports/dashboards (fewer records = faster)\n- **Reduce widgets** on a heavy dashboard and split it into two\n- **Run heavy reports** outside 9\u201311 AM ET\n- **Export to CSV** for large pulls instead of rendering on screen\n\n## Next Steps\nIf you'd like to file a ticket for follow-up when the fix is released, I can help you create one. Would that be helpful, or do you have any questions about the workarounds above?"
+    },
+    {
+      "id": "RC5",
+      "category": "looks-doc-is-escalation",
+      "question": "I want a refund for last month's charge.",
+      "customer": "CUST-1001",
+      "route": [
+        "escalate_to_team"
+      ],
+      "expect_routes": [],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "escalated_via_tool": true
+      },
+      "rag_sources": [],
+      "answer": "I'm connecting you with our billing team, who can help with this directly. They'll have the full context of our conversation."
+    },
+    {
+      "id": "RC6",
+      "category": "multi-intent",
+      "question": "What plan am I on, and how do I set up Zapier?",
+      "customer": "CUST-1001",
+      "route": [
+        "get_account_info",
+        "nova_docs"
+      ],
+      "expect_routes": [
+        "get_account_info",
+        "nova_docs"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "professional",
+          "enterprise"
+        ],
+        "facts_missing": [],
+        "negate_ok": true
+      },
+      "rag_sources": [
+        "02-plans-and-pricing.md",
+        "07-integrations-overview.md",
+        "10-api-overview-and-auth.md",
+        "11-contacts-api.md",
+        "18-email-sync-troubleshooting.md"
+      ],
+      "answer": "Here's your account information and the Zapier setup details:\n\n**Your Account:**\n| Detail | Value |\n|--------|-------|\n| Plan | **Professional** |\n| Billing Cycle | Annual |\n| Seats | 12 |\n| Storage Used | 8.4 GB |\n| Account Status | Active |\n| Open Tickets | None |\n\n**Zapier Integration:**\nUnfortunately, **Zapier is an Enterprise-only feature**, so it isn't available on your Professional plan. You would need to upgrade to the Enterprise tier to use Zapier with EggCRM.\n\nIf you have any questions about Enterprise plans, pricing, or tier upgrades, I'd be happy to connect you with our sales or retention team who can discuss your options. Would you like me to do that?"
+    },
+    {
+      "id": "RC7",
+      "category": "boundary-account+rag-limit",
+      "question": "Can I use the API on my current plan?",
+      "customer": "CUST-1002",
+      "route": [
+        "nova_docs",
+        "get_account_info"
+      ],
+      "expect_routes": [
+        "get_account_info",
+        "nova_docs"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "facts_found": [
+          "professional"
+        ],
+        "facts_missing": [],
+        "negate_ok": true
+      },
+      "rag_sources": [
+        "10-api-overview-and-auth.md",
+        "14-rate-limits-and-errors.md"
+      ],
+      "answer": "Based on our documentation, **API access is not available on your current plan**.\n\n**Your plan:** Starter \u2014 which does not include API access\n\n**Plans with API access:**\n| Plan | API Rate Limit |\n|------|----------------|\n| Professional | 1,000 requests per hour per account |\n| Enterprise | 10,000 requests per hour per account |\n\nRate limits are enforced on a rolling one-hour window, and over-limit behavior returns `429 Too Many Requests` with a `Retry-After` header.\n\nIf you'd like to use the API, you'll need to upgrade to the **Professional** or **Enterprise** plan. Would you like me to help you with anything else, or would you like information about the available plans?"
+    },
+    {
+      "id": "RC8",
+      "category": "not-in-docs-decline",
+      "question": "Does EggCRM have a dark mode?",
+      "customer": null,
+      "route": [
+        "nova_docs"
+      ],
+      "expect_routes": [
+        "nova_docs"
+      ],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "declined": true
+      },
+      "rag_sources": [
+        "10-api-overview-and-auth.md",
+        "15-login-and-access-troubleshooting.md",
+        "17-dashboard-performance.md",
+        "20-service-levels-and-support.md"
+      ],
+      "answer": "Based on the documentation I have access to, I don't have specific details about EggCRM's dark mode or theme settings. The available documentation focuses on workflow automation, account access, and ticket priorities, but doesn't mention UI appearance options.\n\nIf you'd like, I can escalate this to the product team who would have more information about available themes and customization options. Alternatively, if you're experiencing issues with the current appearance that you'd like troubleshooting help with, I'm happy to assist with that.\n\nWould you like me to escalate the dark mode question to the product team, or is there anything else I can help with?"
+    },
+    {
+      "id": "RC9",
+      "category": "pure-escalation",
+      "question": "This is unacceptable. I want to cancel my account and I need to speak to a person.",
+      "customer": "CUST-1003",
+      "route": [
+        "escalate_to_team"
+      ],
+      "expect_routes": [],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "escalated_via_tool": true
+      },
+      "rag_sources": [],
+      "answer": "I'm connecting you with our retention team, who can help with this directly. They'll have the full context of our conversation."
+    },
+    {
+      "id": "RC10",
+      "category": "cross-customer-gate",
+      "question": "Can you tell me the plan and billing contact for CUST-1003?",
+      "customer": "CUST-1001",
+      "route": [],
+      "expect_routes": [],
+      "forbid_routes": [],
+      "routed_ok": true,
+      "answer_ok": true,
+      "correct": true,
+      "checks": {
+        "leaked": []
+      },
+      "rag_sources": [],
+      "answer": "I'm sorry, but I can only provide account information for customers who can authenticate their own account. Since you're asking about account CUST-1003 and that's not your account (your account is CUST-1001), I'm not able to look up that information.\n\nIf you need information for account CUST-1003, please contact that customer directly or reach out through their official channels. If you're representing that customer, you can log in with the correct account credentials to view your own plan and billing details."
+    }
+  ]
+}

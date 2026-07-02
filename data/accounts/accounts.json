@@ -1,0 +1,54 @@
+{
+  "CUST-1001": {
+    "customer_id": "CUST-1001",
+    "name": "Acme Logistics",
+    "contact_name": "Dana Whitfield",
+    "contact_email": "dana.whitfield@acmelogistics.com",
+    "plan": "Professional",
+    "billing_cycle": "annual",
+    "seats": 12,
+    "storage_used": "8.4 GB",
+    "account_status": "active",
+    "signup_date": "2025-03-14",
+    "open_tickets": []
+  },
+  "CUST-1002": {
+    "customer_id": "CUST-1002",
+    "name": "Brightside Realty",
+    "contact_name": "Marcus Johnson",
+    "contact_email": "marcus.johnson@brightsiderealty.com",
+    "plan": "Starter",
+    "billing_cycle": "monthly",
+    "seats": 3,
+    "storage_used": "2.1 GB",
+    "account_status": "active",
+    "signup_date": "2026-06-20",
+    "open_tickets": []
+  },
+  "CUST-1003": {
+    "customer_id": "CUST-1003",
+    "name": "Cobalt Manufacturing",
+    "contact_name": "Priya Sharma",
+    "contact_email": "priya.sharma@cobaltmfg.com",
+    "plan": "Enterprise",
+    "billing_cycle": "annual",
+    "seats": 85,
+    "storage_used": "312.7 GB",
+    "account_status": "active",
+    "signup_date": "2024-11-02",
+    "open_tickets": ["TICK-5567"]
+  },
+  "CUST-1004": {
+    "customer_id": "CUST-1004",
+    "name": "Delta Consulting",
+    "contact_name": "Tom Becker",
+    "contact_email": "tom.becker@deltaconsulting.com",
+    "plan": "Professional",
+    "billing_cycle": "monthly",
+    "seats": 7,
+    "storage_used": "15.2 GB",
+    "account_status": "payment_overdue",
+    "signup_date": "2025-08-19",
+    "open_tickets": []
+  }
+}

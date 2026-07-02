@@ -1,0 +1,99 @@
+{
+  "product": {
+    "name": "NovaCRM",
+    "description": "Cloud-based CRM platform for small and mid-sized businesses"
+  },
+  "pricing": {
+    "tiers": [
+      {
+        "name": "Starter",
+        "price_monthly": 29,
+        "price_annual_monthly": 23.20,
+        "per": "user/month",
+        "features": [
+          "Contact management",
+          "Email integration",
+          "Basic reporting",
+          "5GB storage",
+          "Email support only"
+        ]
+      },
+      {
+        "name": "Professional",
+        "price_monthly": 79,
+        "price_annual_monthly": 63.20,
+        "per": "user/month",
+        "features": [
+          "Everything in Starter",
+          "Pipeline management",
+          "Workflow automation",
+          "API access",
+          "50GB storage",
+          "Priority email + chat support"
+        ]
+      },
+      {
+        "name": "Enterprise",
+        "price_monthly": 149,
+        "price_annual_monthly": 119.20,
+        "per": "user/month",
+        "features": [
+          "Everything in Professional",
+          "Custom integrations",
+          "Advanced analytics",
+          "SSO/SAML",
+          "Unlimited storage",
+          "Dedicated account manager",
+          "Phone support",
+          "99.9% SLA"
+        ]
+      }
+    ],
+    "annual_discount": "20% off monthly price"
+  },
+  "policies": {
+    "billing": "Monthly or annual billing cycles. Annual billing receives 20% discount.",
+    "upgrades": "Plan upgrades take effect immediately. Prorated charge for remainder of billing cycle.",
+    "downgrades": "Plan downgrades take effect at the start of the next billing cycle.",
+    "refunds": "Refunds available within 14 days of initial purchase only. Pro-rated. Agent CANNOT approve refunds — must escalate to billing team.",
+    "password_reset": "Self-service via email link on the login page. Support agents can also trigger a password reset email to the account's registered email address.",
+    "data_export": "Available on all tiers. Export request can be initiated from Settings > Data Management. Processing takes up to 24 hours. Export delivered as ZIP file via email.",
+    "cancellation": "Requires 30-day notice. Agent MUST escalate cancellation requests to the retention team. Cannot process cancellations directly.",
+    "sla": "99.9% uptime SLA available on Enterprise tier only. SLA credits require a support ticket filed within 5 business days of the incident.",
+    "feature_availability_by_tier": "Which plan each feature/integration requires. Starter: contact management, email integration, basic reporting, 5GB storage, email support. Professional adds: pipeline management, workflow automation, API access, Slack integration, Gmail integration, 50GB storage, priority email + chat support. Enterprise adds (Enterprise-only): Zapier integration, custom webhooks, SSO/SAML, advanced analytics, custom integrations, unlimited storage, dedicated account manager, phone support, 99.9% SLA. So Zapier, custom webhooks, SSO/SAML, advanced analytics, and phone support are Enterprise-only; Slack, Gmail, API access, and workflow automation require Professional or higher; contact management and email integration are available on every plan including Starter."
+  },
+  "common_issues": {
+    "login_problems": {
+      "description": "Password reset, account lockout, SSO configuration",
+      "resolution": "Guide user to self-service password reset. If account locked, verify identity and trigger reset email. For SSO issues on Enterprise tier, escalate to integrations team."
+    },
+    "billing_questions": {
+      "description": "Charges, invoices, plan changes, payment methods",
+      "resolution": "Look up account info to verify current plan and billing cycle. For disputes or refund requests, escalate to billing team."
+    },
+    "feature_howto": {
+      "description": "Setting up automations, creating reports, generating API keys",
+      "resolution": "Provide step-by-step guidance. For API keys: Settings > Integrations > API Keys > Generate New Key. Automation setup: Settings > Workflows > New Automation."
+    },
+    "bug_reports": {
+      "description": "Dashboard loading slowly, email sync delays, export failures",
+      "resolution": "Collect details (browser, steps to reproduce, error messages). Create a support ticket with priority based on impact. Known issues: dashboard performance degradation during peak hours (9-11 AM ET) is being addressed in next release."
+    },
+    "integrations": {
+      "description": "Connecting to Slack, Gmail, Zapier, custom webhooks",
+      "resolution": "Guide through Settings > Integrations. Slack and Gmail available on Professional+. Zapier and custom webhooks on Enterprise only. For connection failures, verify API key permissions and check the integration status page."
+    },
+    "data_export": {
+      "description": "Requesting data export, export format questions, GDPR requests",
+      "resolution": "Guide to Settings > Data Management > Export. Format is ZIP containing CSV files. For GDPR deletion requests, escalate to compliance team."
+    }
+  },
+  "escalation_teams": {
+    "billing": "Refund requests, billing disputes, payment failures",
+    "retention": "Cancellation requests, downgrade with risk of churn",
+    "integrations": "SSO/SAML configuration, complex API issues",
+    "compliance": "GDPR requests, legal inquiries, data processing agreements",
+    "engineering": "Confirmed bugs with reproduction steps",
+    "supervisor": "Abusive customers, threats of legal action, situations requiring management"
+  }
+}

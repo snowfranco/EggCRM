@@ -1,0 +1,233 @@
+{
+  "model": "z-ai/glm-4.7-flash",
+  "total": 15,
+  "passed": 15,
+  "pass_rate": 1.0,
+  "regression": {
+    "total": 10,
+    "passed": 10,
+    "results": [
+      {
+        "id": "Q1",
+        "category": "factual-kb",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q2",
+        "category": "account-lookup",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q3",
+        "category": "how-to-kb",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q4",
+        "category": "multi-step",
+        "passed": true,
+        "note": "ok (proposed + confirmed before creating, per prompt)"
+      },
+      {
+        "id": "Q5",
+        "category": "escalation-refund",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q6",
+        "category": "escalation-cancel",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q7",
+        "category": "escalation-gdpr",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q8",
+        "category": "escalation-abuse",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q9",
+        "category": "out-of-scope",
+        "passed": true,
+        "note": "ok"
+      },
+      {
+        "id": "Q10",
+        "category": "ambiguous",
+        "passed": true,
+        "note": "ok"
+      }
+    ]
+  },
+  "scenarios": {
+    "total": 5,
+    "passed": 5,
+    "results": [
+      {
+        "id": "S1",
+        "title": "confirm-then-create ticket",
+        "passed": true,
+        "checks": [
+          {
+            "label": "t2 does NOT create ticket before confirming",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t2 actually asks to confirm (not just a closing question)",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t4 creates the ticket after 'yes'",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "ticket summary references the original issue (email/sync)",
+            "passed": true,
+            "hard": true,
+            "note": "summary='email sync broken for 2 days \u2014 unable to sync emails'"
+          }
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "information carryover (plan context)",
+        "passed": true,
+        "checks": [
+          {
+            "label": "t2 says Zapier needs Enterprise",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          },
+          {
+            "label": "t4 says Slack needs Professional",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t4 does NOT re-ask the plan tier",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "context-enriched escalation",
+        "passed": true,
+        "checks": [
+          {
+            "label": "t2 looks up the account",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t2 notes the overdue/payment status",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          },
+          {
+            "label": "t4 escalates to billing",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "escalation reason references account context (overdue/payment)",
+            "passed": true,
+            "hard": false,
+            "note": "reason=\"customer requests refund for last month's payment\""
+          }
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "mid-conversation correction",
+        "passed": true,
+        "checks": [
+          {
+            "label": "t2 greets the first account (Marcus/Brightside)",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          },
+          {
+            "label": "t4 looks up the corrected account CUST-1003",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t4 references the right account (Priya/Cobalt)",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t4 has NO bleed from the first account (no Marcus/Brightside)",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          }
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "multi-topic efficiency",
+        "passed": true,
+        "checks": [
+          {
+            "label": "t2 loads the account (precondition for reuse)",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          },
+          {
+            "label": "t4 reuses storage figure (312.7) from history",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t4 reuses without re-calling get_account_info (efficiency, optional)",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          },
+          {
+            "label": "t6 explains data export",
+            "passed": true,
+            "hard": true,
+            "note": ""
+          },
+          {
+            "label": "t6 handles audit correctly (explains export, no wrong compliance escalation)",
+            "passed": true,
+            "hard": false,
+            "note": ""
+          }
+        ]
+      }
+    ]
+  }
+}

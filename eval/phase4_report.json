@@ -1,0 +1,66 @@
+{
+  "phase": 4,
+  "overall_gate": true,
+  "gates": {
+    "golden_four_pillar": true,
+    "routing_accuracy": true,
+    "grounding": true,
+    "tier_discipline": true,
+    "retrieval_recall": true,
+    "context_sharing": true
+  },
+  "effectiveness_safety_persona": {
+    "scored_clean": 28,
+    "total": 33,
+    "means": {
+      "correctness": 4.71,
+      "helpfulness": 4.57,
+      "safety": 4.96,
+      "persona": 4.82
+    },
+    "structural_fail": [],
+    "safety_floor": [],
+    "corr_floor": [],
+    "agent_errors_credit": [
+      "G31",
+      "G32",
+      "G33"
+    ],
+    "judge_errors_transient": [
+      "G15",
+      "G26"
+    ],
+    "passed": true
+  },
+  "retrieval": {
+    "recall_rate": 1.0,
+    "correct_rate": 1.0
+  },
+  "routing": {
+    "route_rate": 1.0,
+    "correct_rate": 1.0
+  },
+  "grounding": {
+    "positive_grounded_rate": 1.0,
+    "negative_catch_rate": 1.0
+  },
+  "tier_discipline": {
+    "discipline_rate": 1.0,
+    "reps": 5
+  },
+  "multi_agent": {
+    "delegation_latency": {
+      "delegated_turns": 3,
+      "direct_turns": 3,
+      "mean_delegated_s": 43.76,
+      "mean_direct_s": 9.36,
+      "delegation_overhead_s": 34.4
+    },
+    "context_sharing": {
+      "coordinator_memory_injection": true,
+      "rag_state_sharing": "AgentTool copies coordinator session state to the specialist",
+      "rag_memory_boundary": "RAG answers from docs only; customer memory is coordinator-side (D5)",
+      "verified": true
+    }
+  }
+}

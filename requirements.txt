@@ -1,0 +1,18 @@
+# Project 3 — framework-free. No ADK this time.
+openai>=1.40.0          # OpenAI-compatible client, points at OpenRouter / Groq base URLs
+pydantic>=2.7.0         # schema validation for tool args, memory entries, structured output
+python-dotenv>=1.0.0    # load API keys from .env
+pytest>=8.0.0           # test runner
+fastapi>=0.110.0        # thin /chat + /health wrapper for the demo UI (server.py)
+uvicorn>=0.29.0         # ASGI server to run the FastAPI app
+
+# Project 4 — RAG pipeline (hand-built; P4-D1/D2).
+chromadb>=0.5.0             # embedded, persistent vector store with per-chunk metadata (P4-D1)
+sentence-transformers>=3.0  # local all-MiniLM-L6-v2 embeddings, zero-cost, offline (P4-D2)
+
+# Project 4 — multi-agent coordinator layer (Phase 2, P4-D7). ADK is scoped to routing/delegation
+# ONLY; the RAG pipeline above stays hand-built. `litellm` is ADK's model adapter for non-Gemini
+# providers (GLM-4.7-Flash via OpenRouter, Llama-4-Scout via Groq) — installed explicitly rather
+# than via the heavy `google-adk[extensions]` bundle (which also pulls langgraph/llama-index/etc.).
+google-adk>=2.3.0          # coordinator/delegation layer only (P4-D7)
+litellm>=1.83.0            # ADK's LiteLlm adapter → OpenRouter/Groq (ADK-internal plumbing, P4-D7)

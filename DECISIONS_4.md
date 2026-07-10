@@ -343,3 +343,45 @@ state via AgentTool but by design answers from docs only - memory is coordinator
 knowledge sources coexist with the clean boundary the project set out to demonstrate.
 
 ---
+
+## P4-D11: CI evaluation gate — the eval harness becomes a merge-blocking status check (2026-07-10)
+Implements the signed-off spec (committed at `docs/ci-eval-gate-spec.md`; runbook at
+`docs/ci-eval-gate.md`). The existing evaluators are UNMODIFIED — a thin comparison + reporting
+layer (`eval/ci_gate.py`, stdlib-only, offline-tested) wraps them, plus gate flags on
+`run_eval.py` (`--mode smoke|full`, `--baseline`, `--report`; exit 0 pass / 1 gate fail /
+2 infra) and `.github/workflows/eval-gate.yml`.
+
+**Adopted from the spec:** D-CI-1 baseline≠threshold (`eval/baselines.json`: threshold =
+baseline − tolerance, so judge noise can't false-fail); D-CI-2 two gate classes (HARD:
+structural_pass_rate, safety_pass_rate, routing_discipline — deterministic, tolerance 0; SOFT:
+correctness/helpfulness/persona — median-of-3 judge + 0.3 band); D-CI-3 judge pinned in the
+contract, drift refused as exit-2; D-CI-4 smoke-on-PR (all safety + G01/G12/G18 + routing ×1) /
+full-on-main+nightly; D-CI-5 path filter; D-CI-6 dedicated CI keys (`OPENROUTER_CI_KEY` mapped
+onto the KEY7 slot so CI can't drain dev keys — the LiteLlm no-rotation finding made
+independence mandatory); D-CI-7 JSON report artifact + PR comment table.
+
+**Why routing_discipline is a hard gate (the differentiator):** an output-only gate passes a
+build where Nova stops verifying the account first — the Phase-3 finding (96% answer accuracy
+masking 8% discipline). The demo feature reproduces exactly that: Nova must verify the account
+(`get_account_info`) BEFORE stating refund eligibility; the trace assertion (RT1/RT2 in
+`eval/routing_cases.py`) fails a prompt "simplification" that the judge scores green.
+
+**Repo adaptations (spec was written against abstract names):** the two demo golden cases are
+TRACE-asserted routing cases, not judge cases; the tier cases are imported from
+`tier_discipline.py` unmodified; the workflow publishes the verdict as an `eval-gate-verdict`
+CHECK RUN so exit-2 infra can be NEUTRAL (a plain job status can't express that); the refund
+rule is worded account-dependent (billing cycle/purchase date/plan) rather than tier-dependent
+because the KB's refund policy is account-relative and KB content is human-owned (D3) — the
+trajectory requirement is identical.
+
+**Both-defenses, applied twice:** deterministic hard gates + tolerance-banded judge gates
+(gate level); forced REFUND-ELIGIBILITY workflow step + reinforcing RULES bullet (prompt
+level, mirroring the RC3 tier fix — including its over-trigger lesson: a "what's your refund
+policy?" carve-out routes generic policy questions straight to nova_docs).
+
+**HUMAN-OWNED before the gate goes live:** (1) prompt wording sign-off (D4) for the
+REFUND-ELIGIBILITY block; (2) CI secrets; (3) re-baseline `eval/baselines.json` from a clean
+full run on main (committed values are placeholders from recorded P3/P4 scores); (4) branch
+protection requiring `eval-gate-verdict`. Verified offline: 20 unit tests
+(`tests/test_ci_gate.py`) + a stubbed end-to-end simulation driving all three exit codes,
+including the demo contrast (judge green / routing red).

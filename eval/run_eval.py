@@ -10,11 +10,23 @@ Gate (ruled): mean >= 4.0 per judge dim, no case safety <= 2, no case correctnes
 Judge JSON: one retry, then `judge_error` (logged, excluded from means — never scored 0).
 
 Run: python eval/run_combined.py  ->  eval/combined_report.json + outputs/eval-report.md
+
+CI GATE MODE (spec: docs/ci-eval-gate-spec.md — additive, the evaluators above are unchanged):
+  python eval/run_eval.py --mode {smoke,full} [--baseline eval/baselines.json] [--report PATH]
+Runs the mode's case subset through the COORDINATOR (routing_discipline needs delegation
+traces), scores with a median-of-N temperature-0 judge (D-CI-3), asserts routing discipline on
+the trace (tier cases + the refund-eligibility demo cases), and compares against the committed
+baseline contract (D-CI-1). Without --baseline it is measurement-only (used for re-baselining).
+Exit codes: 0 = all gates pass · 1 = gate failed (hard or soft, encoded per-metric in the
+report) · 2 = infra error (agent/judge unreachable after retries + fallback) — the workflow
+treats 2 as neutral, never as a regression.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
+import os
 import shutil
 import sys
 import time
@@ -30,6 +42,8 @@ from novacrm_agent.orchestrator import SupportAgent          # noqa: E402
 from novacrm_agent.agents.coordinator import NovaCoordinator  # noqa: E402
 from novacrm_agent.session import new_session                # noqa: E402
 from golden_dataset import GOLDEN_CASES                      # noqa: E402
+import ci_gate                                               # noqa: E402
+import routing_cases                                         # noqa: E402
 
 JUDGE_DELAY_S = 5.0  # space judge calls under the Groq free-tier rate limit (+ client backoff)
 DECLINE_MARKERS = ["can't", "cannot", "unable", "only help", "only assist", "not able",
@@ -106,18 +120,80 @@ def judge(jclient, case, response) -> dict:
     return {"judge_error": True, "raw": last_err}
 
 
-def main() -> int:
+def _run_case(agent, case, use_coord: bool) -> dict:
+    """Run one golden case (all turns, one session) and return its result row (no scores).
+
+    One retry on transient provider errors; record-and-continue on persistent failure so a
+    single 402/timeout can't crash a whole run (the `agent_error` field stays visible).
+    """
+    t0 = time.monotonic()
+    last, iters, tokens, err = None, 0, 0, None
+    for attempt in range(2):
+        try:
+            sess = new_session(f"g-{case['id']}", user_id=case["customer"])
+            last, iters, tokens = None, 0, 0
+            for turn in case["turns"]:
+                # pass customer_id so the agent knows the authenticated caller (realistic) —
+                # multi-turn cases pass customer=None and the agent extracts the id.
+                last = agent.run(turn, customer_id=case["customer"], session=sess)
+                iters += last.iterations
+                # SupportAgent tracks tokens via its tracer; CoordinatorResult carries them.
+                tokens += (last.total_tokens if use_coord
+                           else (last.tracer.total_tokens() if last.tracer else 0))
+            err = None
+            break
+        except Exception as e:  # noqa: BLE001 — transient provider/timeout; retry once
+            err = f"{type(e).__name__}: {e}"[:200]
+            time.sleep(3)
+    if err or last is None:
+        row = {"id": case["id"], "category": case["category"], "expected": case["expected"],
+               "structural_pass": False, "iterations": iters, "tokens": tokens,
+               "latency_s": round(time.monotonic() - t0, 2),
+               "final_text": f"(agent_error: {err})", "agent_error": err}
+        print(f"  agent {case['id']:<4} ERROR {err}")
+        return row
+    row = {"id": case["id"], "category": case["category"], "expected": case["expected"],
+           "structural_pass": structural(case, last), "iterations": iters,
+           "tokens": tokens, "latency_s": round(time.monotonic() - t0, 2),
+           "final_text": last.final_text or ""}
+    print(f"  agent {case['id']:<4} struct={'P' if row['structural_pass'] else 'F'}")
+    return row
+
+
+def _parse_args(argv=None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(
+        description="Golden-set combined eval (legacy Phase-6 mode) + CI gate mode.")
+    ap.add_argument("--use-cache", action="store_true",
+                    help="reuse cached agent responses (legacy mode)")
+    ap.add_argument("--coordinator", action="store_true",
+                    help="drive the P4 NovaCoordinator instead of the P3 SupportAgent "
+                         "(legacy mode; gate mode always uses the coordinator)")
+    ap.add_argument("--mode", choices=("smoke", "full"), default=None,
+                    help="CI gate mode: case subset (D-CI-4). Omit for the legacy Phase-6 run.")
+    ap.add_argument("--baseline", default=None,
+                    help="baseline contract JSON; enables compare mode (D-CI-1)")
+    ap.add_argument("--report", default=None,
+                    help="machine-readable report path (default eval/reports/<mode>-<sha>.json)")
+    ap.add_argument("--routing-reps", type=int, default=None,
+                    help="reps per routing-discipline case (default: 1 smoke, 3 full)")
+    return ap.parse_args(argv)
+
+
+def main(argv=None) -> int:
+    args = _parse_args(argv)
     if not config.OPENROUTER_ACTIVE_KEY:
         print("BLOCKED: no funded OpenRouter key (OPENROUTER_ACTIVE_KEY)."); return 2
     if not config.GROQ_API_KEY:
         print("BLOCKED: GROQ_API_KEY missing (needed for the Scout judge)."); return 2
+    if args.mode:
+        return run_gate(args)
 
-    use_cache = "--use-cache" in sys.argv
+    use_cache = args.use_cache
     # --coordinator drives the Phase-2 NovaCoordinator (ADK) instead of the P3 SupportAgent, using
     # SEPARATE cache/report files so the frozen P3 deliverable (golden_responses.json /
     # combined_report.json) is never clobbered. Same golden set, same judge → an apples-to-apples
     # regression of the multi-agent stack against the single-agent baseline.
-    use_coord = "--coordinator" in sys.argv
+    use_coord = args.coordinator
     suffix = "_coord" if use_coord else ""
     agent_label = f"{config.OPENROUTER_GLM_MODEL} (coordinator/ADK)" if use_coord else config.PRIMARY_MODEL
     cache_path = Path(__file__).resolve().parent / f"golden_responses{suffix}.json"
@@ -134,43 +210,11 @@ def main() -> int:
             shutil.rmtree(mem)
         # Coordinator runs GLM via ADK/LiteLlm; SupportAgent uses the hand-built LLMClient default.
         agent = NovaCoordinator(provider="openrouter") if use_coord else SupportAgent(guardrails=True)
-        rows = []
-        for case in GOLDEN_CASES:
-            t0 = time.monotonic()
-            last, iters, tokens, err = None, 0, 0, None
-            # One retry: coordinator LLM calls (ADK/LiteLlm) can transiently time out, and a single
-            # uncaught timeout would otherwise crash the whole 33-case run. Record-and-continue on a
-            # persistent failure so the run always produces a scannable report (the failed case's
-            # error is visible, not silently dropped).
-            for attempt in range(2):
-                try:
-                    sess = new_session(f"g-{case['id']}", user_id=case["customer"])
-                    last, iters, tokens = None, 0, 0
-                    for turn in case["turns"]:
-                        # pass customer_id so the agent knows the authenticated caller (realistic) —
-                        # multi-turn cases pass customer=None and the agent extracts the id.
-                        last = agent.run(turn, customer_id=case["customer"], session=sess)
-                        iters += last.iterations
-                        # SupportAgent tracks tokens via its tracer; CoordinatorResult carries them.
-                        tokens += (last.total_tokens if use_coord
-                                   else (last.tracer.total_tokens() if last.tracer else 0))
-                    err = None
-                    break
-                except Exception as e:  # noqa: BLE001 — transient provider/timeout; retry once
-                    err = f"{type(e).__name__}: {e}"[:200]
-                    time.sleep(3)
-            if err or last is None:
-                rows.append({"id": case["id"], "category": case["category"], "expected": case["expected"],
-                             "structural_pass": False, "iterations": iters, "tokens": tokens,
-                             "latency_s": round(time.monotonic() - t0, 2),
-                             "final_text": f"(agent_error: {err})", "agent_error": err})
-                print(f"  agent {case['id']:<4} ERROR {err}")
-                continue
-            rows.append({"id": case["id"], "category": case["category"], "expected": case["expected"],
-                         "structural_pass": structural(case, last), "iterations": iters,
-                         "tokens": tokens, "latency_s": round(time.monotonic() - t0, 2),
-                         "final_text": last.final_text or ""})
-            print(f"  agent {case['id']:<4} struct={'P' if rows[-1]['structural_pass'] else 'F'}")
+        # One retry per case: coordinator LLM calls (ADK/LiteLlm) can transiently time out, and a
+        # single uncaught timeout would otherwise crash the whole 33-case run. Record-and-continue
+        # on a persistent failure so the run always produces a scannable report (the failed case's
+        # error is visible, not silently dropped).
+        rows = [_run_case(agent, case, use_coord) for case in GOLDEN_CASES]
         cache_path.write_text(json.dumps(rows, indent=2))
         print(f"  (cached {len(rows)} agent responses -> {cache_path.name})")
 
@@ -231,6 +275,183 @@ def main() -> int:
           f"judge_errors {errors or 'none'} ===")
     print("Wrote combined_report.json + outputs/eval-report.md")
     return 0
+
+
+# --- CI gate mode (spec: docs/ci-eval-gate-spec.md) ------------------------------------------
+
+def _fallback_judge_client() -> LLMClient:
+    """Judge fallback = GLM via OpenRouter (Scout <-> GLM, spec §Interface contract): on a
+    primary-judge failure each sample retries once here before counting as infra."""
+    return LLMClient(model=config.OPENROUTER_GLM_MODEL, base_url=config.OPENROUTER_BASE_URL,
+                     api_key=config.OPENROUTER_ACTIVE_KEY)
+
+
+def judge_median(primary: LLMClient, fallback: LLMClient, case: dict, response: str,
+                 samples: int) -> dict:
+    """Median-of-N judge (D-CI-3): N temperature-0 samples, per-dimension median.
+
+    Each failed sample (after judge()'s own retry) retries once on the fallback model; a case
+    that ends with zero valid samples returns judge_error — the gate treats that as infra
+    (exit 2), never as a regression.
+    """
+    valid, errs = [], []
+    for _ in range(samples):
+        s = judge(primary, case, response)
+        if s.get("judge_error"):
+            s = judge(fallback, case, response)
+        if s.get("judge_error"):
+            errs.append(s.get("raw", ""))
+        else:
+            valid.append(s)
+        time.sleep(JUDGE_DELAY_S)
+    if not valid:
+        return {"judge_error": True, "raw": " | ".join(errs)[:300]}
+    dims = ("correctness", "helpfulness", "safety", "persona")
+    return {d: ci_gate.median([v[d] for v in valid]) for d in dims} | {"samples": len(valid)}
+
+
+def _run_routing_cases(nova: NovaCoordinator, reps: int) -> list[dict]:
+    """Trace-asserted routing-discipline runs: the tier cases (tier_discipline, evaluator
+    unmodified) + the refund-eligibility demo cases (routing_cases). One retry per rep on
+    transient provider errors; a persistent failure is recorded as agent_error (infra)."""
+    tier_cases, tier_ok = routing_cases.load_tier_cases()
+    rows = []
+
+    def _attempt(case_id: str, kind: str, rep: int, run_once):
+        row = {"id": case_id, "kind": kind, "rep": rep}
+        err = None
+        for attempt in range(2):
+            try:
+                route, ok, reason = run_once(rep)
+                row |= {"route": route, "discipline_ok": ok, "reason": reason}
+                err = None
+                break
+            except Exception as e:  # noqa: BLE001 — transient provider/timeout; retry once
+                err = f"{type(e).__name__}: {e}"[:200]
+                time.sleep(3)
+        if err:
+            row |= {"discipline_ok": False, "reason": "agent_error", "agent_error": err}
+        print(f"  routing {row['id']:<4} rep{rep} "
+              f"{'OK  ' if row['discipline_ok'] else 'FAIL'} ({row['reason']})")
+        rows.append(row)
+
+    for case in tier_cases:
+        def _tier_once(rep, case=case):
+            sess = new_session(f"ci-rt-{case['id']}-{rep}", user_id=case["customer"])
+            r = nova.run(case["q"], customer_id=case["customer"], session=sess)
+            ok, reason = tier_ok(r.route)
+            return r.route, ok, reason
+        for rep in range(reps):
+            _attempt(case["id"], "tier", rep, _tier_once)
+
+    for case in routing_cases.REFUND_CASES:
+        def _refund_once(rep, case=case):
+            sess = new_session(f"ci-rt-{case['id']}-{rep}", user_id=case["customer"])
+            route: list[str] = []
+            for turn in case["turns"]:
+                r = nova.run(turn, customer_id=case["customer"], session=sess)
+                route.extend(r.route)
+            ok, reason = routing_cases.refund_discipline_ok(route)
+            return route, ok, reason
+        for rep in range(reps):
+            _attempt(case["id"], "refund", rep, _refund_once)
+
+    return rows
+
+
+def run_gate(args: argparse.Namespace) -> int:
+    """CI gate: run the mode's subset through the coordinator, compare against the committed
+    baseline contract, write the auditable report (D-CI-7). Exit 0 pass / 1 fail / 2 infra."""
+    baselines = ci_gate.load_baselines(args.baseline) if args.baseline else None
+    if baselines:
+        pin_err = ci_gate.validate_judge_pin(baselines, config.JUDGE_MODEL)
+        if pin_err:
+            print(f"INFRA: {pin_err}")
+            return 2
+    samples = (baselines or {}).get("judge_samples", 3)
+    cases = ci_gate.select_cases(GOLDEN_CASES, args.mode)
+    by_id = {c["id"]: c for c in GOLDEN_CASES}
+    reps = args.routing_reps or (1 if args.mode == "smoke" else 3)
+    sha = os.environ.get("GITHUB_SHA") or "local"
+    report_path = args.report or str(
+        Path(__file__).resolve().parent / "reports" / f"{args.mode}-{sha}.json")
+    print(f"CI eval gate — mode={args.mode} | {len(cases)} golden cases | "
+          f"routing reps={reps} | judge {config.JUDGE_MODEL} x{samples}\n")
+
+    mem = _ROOT / "data" / "memory_store"  # isolation from prior-phase memories
+    if mem.exists():
+        shutil.rmtree(mem)
+    nova = NovaCoordinator(provider="openrouter")
+
+    rows = [_run_case(nova, case, use_coord=True) for case in cases]
+    routing_rows = _run_routing_cases(nova, reps)
+    infra = [f"agent:{r['id']}: {r['agent_error']}" for r in rows if r.get("agent_error")]
+    infra += [f"routing:{r['id']}: {r['agent_error']}" for r in routing_rows
+              if r.get("agent_error")]
+
+    jprimary = LLMClient(model=config.JUDGE_MODEL, base_url=config.JUDGE_BASE_URL,
+                         api_key=config.GROQ_API_KEY)
+    jfallback = _fallback_judge_client()
+    for r in rows:
+        if r.get("agent_error"):
+            r["scores"] = {"judge_error": True, "raw": "skipped: agent_error"}
+            continue
+        r["scores"] = judge_median(jprimary, jfallback, by_id[r["id"]], r["final_text"], samples)
+        s = ("ERR" if r["scores"].get("judge_error") else "/".join(
+            f"{r['scores'][d]:g}" for d in ("correctness", "helpfulness", "safety", "persona")))
+        print(f"  judge {r['id']:<4} {r['category']:<11} c/h/s/p={s}")
+    infra += [f"judge:{r['id']}: {r['scores'].get('raw', '')}" for r in rows
+              if r["scores"].get("judge_error") and not r.get("agent_error")]
+    rows = [{**r, "final_text": (r["final_text"] or "")[:200]} for r in rows]
+
+    judged = [r for r in rows if not r["scores"].get("judge_error")]
+    srows = [r for r in rows if by_id[r["id"]]["category"] == "safety"]
+    measured = {
+        "structural_pass_rate": round(sum(r["structural_pass"] for r in rows) / len(rows), 4),
+        "safety_pass_rate": (round(sum(r["structural_pass"] for r in srows) / len(srows), 4)
+                             if srows else None),
+        "routing_discipline": round(
+            sum(r["discipline_ok"] for r in routing_rows) / len(routing_rows), 4),
+    }
+    for dim in ("correctness", "helpfulness", "persona"):
+        if judged:
+            measured[dim] = round(sum(r["scores"][dim] for r in judged) / len(judged), 4)
+    infra += [f"metric:{k}: not measured" for k, v in measured.items() if v is None]
+    extra = {"n_golden": len(rows), "routing_reps": reps, "measured": measured,
+             "golden_rows": rows, "routing_rows": routing_rows}
+
+    # Infra vs regression (spec §Interface contract): a run the harness couldn't complete is
+    # exit 2 — the workflow shows it neutral so flakiness never reads as a regression.
+    if infra:
+        report = ci_gate.build_report(sha=sha, mode=args.mode, judge_model=config.JUDGE_MODEL,
+                                      metrics={},
+                                      extra=extra | {"infra_error": True, "infra_errors": infra})
+        report["overall_pass"] = None
+        ci_gate.write_report(report, report_path)
+        print("\n=== GATE INFRA ERROR (exit 2 — neutral, not a regression) ===")
+        for line in infra:
+            print(f"  {line}")
+        print(f"Wrote {report_path}")
+        return 2
+
+    if not baselines:
+        # Measurement-only (re-baselining): record what was measured, no verdict.
+        report = ci_gate.build_report(sha=sha, mode=args.mode, judge_model=config.JUDGE_MODEL,
+                                      metrics={}, extra=extra)
+        report["overall_pass"] = None
+        ci_gate.write_report(report, report_path)
+        print(f"\n=== MEASUREMENT ONLY (no --baseline) | {measured} ===\nWrote {report_path}")
+        return 0
+
+    metrics = ci_gate.compare_metrics(baselines, measured)
+    report = ci_gate.build_report(sha=sha, mode=args.mode, judge_model=config.JUDGE_MODEL,
+                                  metrics=metrics, extra=extra)
+    ci_gate.write_report(report, report_path)
+    print("\n" + ci_gate.format_table(metrics))
+    print(f"\n=== GATE {'PASS' if report['overall_pass'] else 'FAIL'} | "
+          f"hard {report['hard_failures'] or 'none'} | soft {report['soft_failures'] or 'none'} ===")
+    print(f"Wrote {report_path}")
+    return ci_gate.exit_code(report)
 
 
 def _write_markdown(r, suffix=""):

@@ -19,6 +19,8 @@ data/escalations/
 # ChromaDB persistent vector store (Project 4) — rebuilt by `python -m novacrm_agent.rag.ingest`
 data/rag_store/
 eval/logs/
+# CI gate run reports (uploaded as build artifacts, D-CI-7 — not source)
+eval/reports/
 *.log
 # adk web / adk run session + artifact storage (created under the agents dir at runtime)
 .adk/

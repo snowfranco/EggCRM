@@ -1,0 +1,165 @@
+# CI evaluation gate (spec: docs/ci-eval-gate-spec.md, runbook: docs/ci-eval-gate.md).
+#
+# PR -> smoke subset (all safety + representative cases, D-CI-4); push to main / nightly /
+# manual -> full set. Path-filtered so docs-only PRs skip the gate (D-CI-5).
+#
+# The job itself always completes; the merge-blocking verdict is the `eval-gate-verdict`
+# CHECK RUN created below, which maps the harness exit code 0/1/2 to success/failure/NEUTRAL —
+# so an infra error (exit 2: judge unreachable after retries + fallback) never reads as a
+# regression (spec §Interface contract). Branch protection (human, repo settings): require the
+# `eval-gate-verdict` status check + "require branches to be up to date before merging".
+name: eval-gate
+
+on:
+  pull_request:
+    # D-CI-5 adapted to this repo's layout: trigger only where behavior can change —
+    # prompts/routing/guardrails (src), the eval contract itself, the RAG corpus, and deps.
+    paths:
+      - "src/novacrm_agent/**"
+      - "eval/**"
+      - "data/knowledge_base/**"
+      - "requirements.txt"
+      - ".github/workflows/eval-gate.yml"
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 6 * * *" # nightly full run (D-CI-4)
+  workflow_dispatch:
+
+concurrency:
+  group: eval-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write # eval-gate-verdict check run
+      pull-requests: write # report comment
+    env:
+      # D-CI-6: dedicated CI keys with their own rate budget, mapped onto the names
+      # config.py reads. OPENROUTER_API_KEY7 is the highest-precedence slot in the key
+      # chain, so the CI key is what both LLMClient and ADK/LiteLlm pick up.
+      OPENROUTER_API_KEY7: ${{ secrets.OPENROUTER_CI_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_CI_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-minilm-l6-v2
+
+      # data/rag_store/ is gitignored — without this step nova_docs retrieval is empty and
+      # every grounded answer (and the routing metric behind it) would fail for the wrong reason.
+      - name: Build RAG store
+        run: PYTHONPATH=src python -m novacrm_agent.rag.ingest
+
+      - name: Run eval gate
+        id: gate
+        run: |
+          MODE=smoke
+          if [ "${{ github.event_name }}" != "pull_request" ]; then MODE=full; fi
+          REPORT="eval/reports/${MODE}-${{ github.sha }}.json"
+          set +e
+          python eval/run_eval.py --mode "$MODE" --baseline eval/baselines.json --report "$REPORT"
+          CODE=$?
+          set -e
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "report=$REPORT" >> "$GITHUB_OUTPUT"
+          # Never fail this step: the verdict check run below carries pass/fail/neutral.
+          exit 0
+
+      - name: Upload report artifact (D-CI-7)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-${{ github.sha }}
+          path: eval/reports/
+          if-no-files-found: warn
+
+      - name: Publish verdict + PR comment
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          GATE_CODE: ${{ steps.gate.outputs.code }}
+          REPORT_PATH: ${{ steps.gate.outputs.report }}
+        with:
+          script: |
+            const fs = require('fs');
+            const code = Number(process.env.GATE_CODE ?? '2');
+            let report = null;
+            try { report = JSON.parse(fs.readFileSync(process.env.REPORT_PATH, 'utf8')); } catch {}
+
+            // Exit-code contract: 0 pass, 1 gate failure (hard or soft), 2 infra -> neutral.
+            const conclusion = code === 0 ? 'success' : code === 1 ? 'failure' : 'neutral';
+            const headline = code === 0 ? '✅ PASS'
+              : code === 1 ? '❌ FAIL'
+              : '⚠️ INFRA ERROR (neutral — not a regression)';
+
+            let body = `## Eval gate — ${headline}\n`;
+            if (report) {
+              body += `\nmode: \`${report.mode}\` · sha: \`${report.sha}\` · judge: \`${report.judge_model}\`\n`;
+              const metrics = report.metrics || {};
+              if (Object.keys(metrics).length) {
+                body += '\n| metric | baseline | threshold | measured | Δ | class | verdict |\n';
+                body += '|---|---|---|---|---|---|---|\n';
+                for (const [name, m] of Object.entries(metrics)) {
+                  const hasNums = typeof m.measured === 'number' && typeof m.baseline === 'number';
+                  const d = hasNums ? m.measured - m.baseline : null;
+                  const delta = hasNums ? (d >= 0 ? '+' : '') + d.toFixed(3) : '—';
+                  const verdict = m.pass === true ? '✅ pass'
+                    : m.pass === false
+                      ? (m.class === 'hard' ? '❌ FAIL (hard)' : '🔻 FAIL (soft)')
+                      : '—';
+                  body += `| ${name} | ${m.baseline ?? '—'} | ${m.threshold ?? '—'} | ${m.measured ?? '—'} | ${delta} | ${m.class ?? '—'} | ${verdict} |\n`;
+                }
+              }
+              if (report.hard_failures?.length) body += `\n**Hard failures:** ${report.hard_failures.join(', ')}\n`;
+              if (report.soft_failures?.length) body += `\n**Soft failures:** ${report.soft_failures.join(', ')}\n`;
+              if (report.infra_errors?.length) {
+                body += '\n**Infra errors (exit 2 — neutral):**\n'
+                  + report.infra_errors.map(e => `- \`${e}\``).join('\n') + '\n';
+              }
+            } else {
+              body += `\nNo report file was produced (exit code ${code}) — the harness failed before writing one; see the job log.\n`;
+            }
+            body += '\nFull per-case detail is in the `eval-report` build artifact (D-CI-7).';
+
+            const headSha = context.payload.pull_request?.head?.sha || context.sha;
+            await github.rest.checks.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              name: 'eval-gate-verdict', head_sha: headSha,
+              status: 'completed', conclusion,
+              output: { title: `eval gate: ${conclusion}`, summary: body },
+            });
+
+            if (context.payload.pull_request) {
+              const marker = '<!-- eval-gate-report -->';
+              const issue_number = context.payload.pull_request.number;
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number, per_page: 100,
+              });
+              const mine = comments.find(c => c.body?.includes(marker));
+              const full = `${marker}\n${body}`;
+              if (mine) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  comment_id: mine.id, body: full,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo, issue_number, body: full,
+                });
+              }
+            }

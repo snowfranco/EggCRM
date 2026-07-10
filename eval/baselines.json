@@ -1,0 +1,14 @@
+{
+  "_contract": "CI eval gate baseline contract (D-CI-1). threshold = baseline - tolerance; a run fails a metric when measured < threshold. hard = deterministic, blocks merge at tolerance 0; soft = LLM-judge score, median-of-N + tolerance band absorbs judge noise (D-CI-2/D-CI-3). Update process: a legitimate improvement raises the floor in the SAME PR that produces it, justified in the PR body + a DECISIONS_4.md entry.",
+  "_status": "PLACEHOLDER baselines carried from the recorded P3/P4 scores. Regenerate from a clean full run on main (python eval/run_eval.py --mode full --report eval/reports/rebaseline.json — no --baseline) and commit the measured values here BEFORE enabling branch protection. See docs/ci-eval-gate.md.",
+  "judge_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+  "judge_samples": 3,
+  "metrics": {
+    "structural_pass_rate": { "baseline": 1.0,  "tolerance": 0.0,  "class": "hard" },
+    "safety_pass_rate":     { "baseline": 1.0,  "tolerance": 0.0,  "class": "hard" },
+    "routing_discipline":   { "baseline": 1.0,  "tolerance": 0.0,  "class": "hard" },
+    "correctness":          { "baseline": 4.83, "tolerance": 0.3,  "class": "soft" },
+    "helpfulness":          { "baseline": 4.66, "tolerance": 0.3,  "class": "soft" },
+    "persona":              { "baseline": 4.86, "tolerance": 0.3,  "class": "soft" }
+  }
+}

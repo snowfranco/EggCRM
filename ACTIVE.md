@@ -14,6 +14,33 @@ PASS, golden regression NO regression (30/33 scored clean at Phase-2 parity + 3 
 individually) — a cosmetic 33/33 re-run was declined as process theater. `OPENROUTER_API_KEY7` added
 + wired as the active key (KEY7→KEY6→…). ADK web UI live (`adk web adk_app`). 2026-07-01.
 
+## CI EVAL GATE — BUILT, pending human enablement (P4-D11). 2026-07-10.
+Implements the signed-off spec (`docs/ci-eval-gate-spec.md`; runbook `docs/ci-eval-gate.md`).
+Evaluators UNMODIFIED — added a thin compare/report layer + workflow:
+- `eval/ci_gate.py` (stdlib-only compare logic: threshold = baseline − tolerance, hard/soft
+  classes, judge pin, smoke selection) + `eval/baselines.json` (contract; **values are
+  PLACEHOLDERS** from recorded P3/P4 scores) + `eval/routing_cases.py` (RT1/RT2
+  refund-eligibility trace cases; tier cases imported from `tier_discipline.py` unmodified).
+- `run_eval.py` gained gate flags (`--mode smoke|full --baseline --report`; exit 0/1/2 —
+  2 = infra, judged NEUTRAL in CI so flakiness never reads as regression). Judge in gate mode:
+  median-of-3 at temp 0, per-sample Scout↔GLM fallback. Legacy invocations unchanged.
+- `.github/workflows/eval-gate.yml`: PR→smoke, main/nightly/dispatch→full; path-filtered;
+  uploads the report artifact; posts/updates a PR comment table; publishes the merge-blocking
+  **`eval-gate-verdict` check run** (success/failure/neutral).
+- **Demo feature (prompt, D4 — NEEDS SIGN-OFF):** `COORDINATOR_INSTRUCTION` now splits refund
+  REQUEST (→ billing escalation, unchanged) from refund-ELIGIBILITY question (→ verify account
+  FIRST via `get_account_info`, then `nova_docs`, then answer for their account; generic
+  "what's your refund policy?" carve-out stays docs-only). Both-defenses: workflow step + RULES
+  bullet. This is the trajectory regression the demo blocks (judge green / routing red).
+- **Verified offline:** 20 new unit tests (`tests/test_ci_gate.py`) pass; stubbed end-to-end sim
+  drove all three exit codes incl. the demo contrast (hard_failures=[routing_discipline],
+  correctness still passing). Live smoke/full runs NOT executed here (no keys in this env).
+- **HUMAN TODO to enable:** (1) D4 sign-off on the prompt wording; (2) add `OPENROUTER_CI_KEY`
+  + `GROQ_CI_KEY` secrets (D-CI-6 — standalone budgets); (3) re-baseline on main:
+  `python eval/run_eval.py --mode full --report eval/reports/rebaseline.json` → copy `measured`
+  into `baselines.json`; (4) branch protection: require `eval-gate-verdict` + up-to-date;
+  (5) optionally run the red→green demo (runbook §Demonstration, branch `demo/routing-regression`).
+
 ### Phase 1 — COMPLETE (standalone RAG agent + baseline gate PASS). 2026-06-30.
 - **RAG agent BUILT** (`src/novacrm_agent/agents/rag_agent.py`): NovaDocs, own hand-rolled ReAct
   loop (framework-free per P4-D7 — ADK enters at Phase 2, not here), two retrieval tools

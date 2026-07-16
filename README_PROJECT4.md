@@ -137,4 +137,3 @@ discipline 8%→100%; the grounding eval then catching the RC3 fix's over-correc
 - _Was ADK worth it for a 3-agent system, or would a hand-rolled router have been simpler?_
 - _Where is the framework's leverage vs its lock-in, having now built both ways (P1/ADK, P3 raw, P4 hybrid)?_
 - _What would you reach for next time, and for what shape of problem?_
-```
